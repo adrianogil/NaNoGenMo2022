@@ -2,6 +2,6 @@
 
 class StoryGeneration:
     def generate(self):
-        print("Start genering a new story!")
+        print("Start generating a new story!")
         story = "Once upon time... "
         return story

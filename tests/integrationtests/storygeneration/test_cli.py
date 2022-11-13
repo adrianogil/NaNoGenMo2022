@@ -8,9 +8,9 @@ def test_cli_output(capsys):
     cli(args)
     captured = capsys.readouterr()
     result = captured.out
-    assert "Start genering a new story!" in result
+    assert "Start generating a new story!" in result
 
 
 def test_cli_output_subprocess():
     result = subprocess.run(["generate"], capture_output=True)
-    assert b"Start genering a new story!" in result.stdout
+    assert b"Start generating a new story!" in result.stdout
