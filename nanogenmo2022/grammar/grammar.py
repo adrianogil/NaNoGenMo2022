@@ -29,6 +29,11 @@ class SimpleGrammar:
         Class for handling text generation
     """
     def __init__(self):
+        self._tags = {}
+        self._static_tags = {}
+        self._text_functions = {}
+        self._main_text = ""
+
         self.reset_tags()
 
     def st(self, text):
@@ -38,31 +43,31 @@ class SimpleGrammar:
         return self.add_tag(tag, expression)
 
     def set_text(self, text):
-        self.main_text = text
+        self._main_text = text
 
         return self
 
     def __str__(self):
-        return self.evaluate(self.main_text)
+        return self.evaluate(self._main_text)
 
     def reset_tags(self):
-        self.tags = {}
-        self.static_tags = {}
-        self.text_functions = {}
-
-        self.text_functions['capitalize'] = capitalize
+        self._tags = {}
+        self._static_tags = {}
+        self._text_functions = {'capitalize': capitalize}
 
     def add_tag(self, tag, expression):
-    """
-        self.add_tag(tag='tag-name', expression=['expression_term1', 'expression_term2']) -> self
+        """
+            self.add_tag(tag='tag-name', expression=['expression_term1', 'expression_term2']) -> self
 
-        register tag as expression
-    """
+            register tag as expression
+        """
         # printme('[Debug] [txtgamelib.grammar.simplegrammar] SimpleGrammar:add_tag -' + ' tag - ' + str(tag) + ' expression - ' + str(expression), debug=True)
-        self.tags[tag] = expression
+        self._tags[tag] = expression
         return self
 
-    def evaluate(self, text):
+    def evaluate(self, text=None):
+        if text is None:
+            text = self._main_text
         # printme('[txtgamelib.grammar.simplegrammar] SimpleGrammar:evaluate -' + ' text - ' + str(text), debug=True)
         found_tags = self.parse_tags_from(text)
 
@@ -106,17 +111,17 @@ class SimpleGrammar:
                         # print("debug: prefix_tag: " + prefix_tag)
                         break
                 if is_integer(prefix_tag):
-                    if t not in self.static_tags:
-                        if real_tag in self.tags:
-                            self.static_tags[t] = self.evaluate(get_random_element(self.tags[real_tag]))
-                    if t in self.static_tags:
-                        tags_evaluated.append(self.static_tags[t])
-                elif prefix_tag in self.text_functions:
+                    if t not in self._static_tags:
+                        if real_tag in self._tags:
+                            self._static_tags[t] = self.evaluate(get_random_element(self._tags[real_tag]))
+                    if t in self._static_tags:
+                        tags_evaluated.append(self._static_tags[t])
+                elif prefix_tag in self._text_functions:
                     real_tag = self.evaluate("#" + real_tag + "#")
-                    tags_evaluated.append(self.text_functions[prefix_tag](real_tag))
-            elif t in self.tags:
+                    tags_evaluated.append(self._text_functions[prefix_tag](real_tag))
+            elif t in self._tags:
                 # print(t)
-                tagged_text = get_random_element(self.tags[t])
+                tagged_text = get_random_element(self._tags[t])
                 tags_evaluated.append(self.evaluate(tagged_text))
 
         return tags_evaluated
